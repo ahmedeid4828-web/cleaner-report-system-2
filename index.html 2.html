@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustClean - Workers Department Report</title>
+    <!-- Google Fonts for Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #E8F5E8 0%, #F1F8E9 100%); /* Light green gradient matching Just Clean app backgrounds */
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px; /* Rounded corners like app cards */
+            box-shadow: 0 10px 30px rgba(0, 198, 83, 0.1); /* Subtle green-tinted shadow */
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #00C853 0%, #00A651 100%); /* Exact Just Clean green gradient for header */
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .branding-subtitle {
+            font-size: 1.3em;
+            opacity: 0.95;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        /* Password Modal */
+        .password-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .password-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .password-box h2 {
+            color: #00C853; /* Just Clean green */
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .password-box input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .password-box input:focus {
+            border-color: #00C853; /* Green focus like app inputs */
+            outline: none;
+        }
+        .login-btn {
+            background: #00C853; /* Exact app green for buttons */
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .login-btn:hover {
+            background: #00A651; /* Darker green hover, matching app interactions */
+        }
+        /* Form Section */
+        .form-section {
+            padding: 40px;
+            background: #F5F5F5; /* Light gray like app sections */
+        }
+        .form-section h2 {
+            color: #00C853; /* Green headers */
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+        .issue-type-label {
+            color: #00C853;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            text-align: center;
+            display: block;
+        }
+        form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        label {
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: #00C853; /* Green focus */
+            outline: none;
+        }
+        .submit-btn {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #00C853 0%, #00A651 100%); /* Just Clean green gradient for submit */
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 198, 83, 0.3); /* Green shadow like app buttons */
+        }
+        /* Table Section */
+        .table-section {
+            padding: 40px;
+            background: white;
+        }
+        .table-section h2 {
+            color: #00C853; /* Green headers */
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+        .export-btn {
+            background: #00C853; /* Green for export, consistent with app */
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .export-btn:hover {
+            background: #00A651; /* Darker green */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 15px;
+            text-align: left; /* LTR for English */
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #00C853; /* Just Clean green table header */
+            color: white;
+            font-weight: 500;
+        }
+        tr:hover {
+            background: #E8F5E8; /* Light green hover like app rows */
+        }
+        tr:nth-child(even) {
+            background: #F8F9FA;
+        }
+        /* Responsive for Mobile (App-like) */
+        @media (max-width: 768px) {
+            form {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            header h1 {
+                font-size: 2em;
+            }
+        }
+        /* Success/Error Messages (App-style alerts) */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+        .alert-success {
+            background: #C8E6C9; /* Light green success like Just Clean notifications */
+            color: #2E7D32;
+            border: 1px solid #A5D6A7;
+        }
+        .alert-error {
+            background: #FFCDD2; /* Light red error */
+            color: #C62828;
+            border: 1px solid #EF9A9A;
+        }
+    </style>
+</head>
+<body>
+    <!-- Password Modal -->
+    <div id="passwordModal" class="password-modal">
+        <div class="password-box">
+            <h2><i class="fas fa-lock"></i> Enter Password to Access</h2>
+            <input type="password" id="passwordInput" placeholder="Password...">
+            <button class="login-btn" onclick="checkPassword()"><i class="fas fa-sign-in-alt"></i> Login</button>
+        </div>
+    </div>
+
+    <div class="container" id="mainContent" style="display: none;">
+        <header>
+            <h1><i class="fas fa-broom"></i> JustClean</h1>
+            <div class="branding-subtitle">Workers Department Report</div>
+            <p>Log issues and reports easily and professionally</p>
+        </header>
+
+        <!-- Form Section -->
+        <section class="form-section">
+            <h2><i class="fas fa-plus"></i> Add New Report</h2>
+            <form id="reportForm">
+                <div>
+                    <label for="company">Company Name:</label>
+                    <input type="text" id="company" required>
+                </div>
+                <div>
+                    <label class="issue-type-label">JustClean - Issue Type:</label>
+                    <select id="issueType" required>
+                        <option value="">Select...</option>
+                        <option value="Quality issue">Quality issue</option>
+                        <option value="Slow">Slow</option>
+                        <option value="Hygiene issue">Hygiene issue</option>
+                        <option value="Appearance">Appearance</option>
+                        <option value="Bad attitude">Bad attitude</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="employee">Employee Name:</label>
+                    <input type="text" id="employee" required>
+                </div>
+                <div>
+                    <label for="country">Country:</label>
+                    <select id="country" required>
+                        <option value="">Select...</option>
+                        <option value="Kuwait">Kuwait</option>
+                        <option value="Bahrain">Bahrain</option>
+                        <option value="Saudi Arabia">Saudi Arabia</option>
+                        <option value="Qatar">Qatar</option>
+                        <option value="Oman">Oman</option>
+                        <option value="UAE">UAE</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="orderNumber">Order Number:</label>
+                    <input type="text" id="orderNumber" required placeholder="Enter number or text">
+                </div>
+                <div>
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" required>
+                </div>
+                <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Submit Report</button>
+            </form>
+            <div id="message"></div>
+        </section>
+
+        <!-- Table Section -->
+        <section class="table-section">
+            <h2><i class="fas fa-table"></i> Logged Reports</h2>
+            <button class="export-btn" onclick="exportToCSV()"><i class="fas fa-download"></i> Export to CSV (Excel)</button>
+            <table id="reportsTable">
+                <thead>
+                    <tr>
+                        <th>Company Name</th>
+                        <th>Issue Type</th>
+                        <th>Employee Name</th>
+                        <th>Country</th>
+                        <th>Order Number</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsBody"></tbody>
+            </table>
+        </section>
+    </div>
+
+    <script>
+        // Password (change if needed, currently 'password123')
+        const PASSWORD = 'password123';
+
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            if (input === PASSWORD) {
+                document.getElementById('passwordModal').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                loadReports();
+                document.getElementById('date').valueAsDate = new Date();
+            } else {
+                alert('Incorrect password! Try "password123" exactly.');
+            }
+        }
+
+        // Show modal on load
+        window.onload = function() {
+            document.getElementById('passwordModal').style.display = 'flex';
+        };
+
+        // Store data in localStorage
+        let reports = JSON.parse(localStorage.getItem('reports')) || [];
+
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newReport = {
+                company: document.getElementById('company').value,
+                issueType: document.getElementById('issueType').value,
+                employee: document.getElementById('employee').value,
+                country: document.getElementById('country').value,
+                orderNumber: document.getElementById('orderNumber').value,
+                date: document.getElementById('date').value,
+                id: Date.now()
+            };
+            reports.unshift(newReport); // Add to top
+            localStorage.setItem('reports', JSON.stringify(reports));
+            showMessage('Report added successfully!', 'success');
+            this.reset();
+            document.getElementById('date').valueAsDate = new Date();
+            loadReports();
+        });
+
+        function loadReports() {
+            const tbody = document.getElementById('reportsBody');
+            tbody.innerHTML = '';
+            reports.forEach(report => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${report.company}</td>
+                    <td>${report.issueType}</td>
+                    <td>${report.employee}</td>
+                    <td>${report.country}</td>
+                    <td>${report.orderNumber}</td>
+                    <td>${report.date}</td>
+                    <td><button onclick="deleteReport(${report.id})" style="background:#F44336;color:white;border:none;padding:5px 10px;border-radius:5px;cursor:pointer;"><i class="fas fa-trash"></i> Delete</button></td>
+                `;
+            });
+        }
+
+        function deleteReport(id) {
+            if (confirm('Are you sure you want to delete?')) {
+                reports = reports.filter(r => r.id !== id);
+                localStorage.setItem('reports', JSON.stringify(reports));
+                loadReports();
+                showMessage('Deleted successfully!', 'success');
+            }
+        }
+
+        function exportToCSV() {
+            if (reports.length === 0) {
+                showMessage('No data to export!', 'error');
+                return;
+            }
+            let csv = 'Company Name,Issue Type,Employee Name,Country,Order Number,Date\n';
+            reports.forEach(r => {
+                csv += `${r.company},${r.issueType},${r.employee},${r.country},${r.orderNumber},${r.date}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'justclean-workers-reports.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showMessage('Exported successfully!', 'success');
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.innerHTML = `<div class="alert alert-${type}">${text}</div>`;
+            setTimeout(() => msg.innerHTML = '', 3000);
+        }
+    </script>
+</body>
+</html>
